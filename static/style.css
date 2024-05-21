@@ -1,39 +1,46 @@
 * {
   box-sizing: border-box;
   margin: 0;
-  padding: 0  px;
 }
 
 body {
   font-family: 'Nunito', sans-serif;
-  font-weight: 400;
-  font-size: 100%;
-  background: #36a1d4;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
 }
 
 *, html {
-  --primaryGradient: linear-gradient(91.09deg, #d22d16 1%, #f89b20 100%);
-  --secondaryGradient: linear-gradient(268.91deg, #d22d16 -2.14%, #f89b20 99.69%);
+  --primaryGradient: linear-gradient(91.09deg, #286eb9 1%, #209ef8 100%);
+  --secondaryGradient: linear-gradient(91.09deg, #209ef8 100%, #1f77d4 1%);
   --primaryBoxShadow: 0px 10px 15px rgba(0, 0, 0, 0.1);
   --secondaryBoxShadow: 0px -10px 15px rgba(0, 0, 0, 0.1);
-  --primary: #d22d16;
+  --primary: #9016d2;
   --comic-sans: "Comic Sans MS"
 }
 
 .head{
-  margin: 12px;
-  text-align: center;
-  font-family: var(--comic-sans)
+  font-family: var(--comic-sans);
+  font-weight: 400;
+  font-size: 400%;
+  position: absolute;
+  top: 6%;
+  left: 45%;
+  transform: translate(-50%, -50%);
+  color: rgb(26, 8, 67);
 }
+
 
 /* CHATBOX
 =============== */
 .chatbox {
   position: absolute;
   bottom: 30px;
-  right: 30px;
+  right: 2px;
   margin-bottom: 17px;
-  margin-right: 400px;
+  margin-right: 80px;
 }
 
 /* CONTENT IS CLOSE */
@@ -59,6 +66,10 @@ body {
 /* BUTTON */
 .chatbox__button {
   text-align: right;
+  padding: 10px;
+}
+.chatbox__button>button{
+  padding: 10px;
 }
 
 .send__button {
@@ -74,7 +85,7 @@ body {
 .chatbox__header {
   position: sticky;
   top: 0;
-  background: orange;
+  background: rgb(123, 66, 222);
 }
 
 /* MESSAGES */
@@ -83,10 +94,12 @@ body {
   display: flex;
   overflow-y: scroll;
   flex-direction: column-reverse;
+  background-color: #209ef8;
+  overflow-x: hidden;
 }
 
 .messages__item {
-  background: orange;
+  background: rgb(149, 0, 255);
   max-width: 60.6%;
   width: fit-content;
 }
@@ -179,7 +192,6 @@ body {
   box-shadow: var(--secondaryBoxShadow);
   border-bottom-right-radius: 10px;
   border-bottom-left-radius: 10px;
-  margin-top: 20px;
 }
 
 .chatbox__footer input {
@@ -212,7 +224,14 @@ body {
 }
 
 .img {
-  margin-top: 50px;
+  position: relative;
+  overflow: hidden;
+  height: 115vh;
+  width: 110%;
   
-  text-align: center;
+}
+#background-video {
+  position: absolute;
+  width: auto;
+  height: 100%;
 }
