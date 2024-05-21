@@ -1,92 +1,68 @@
 import json
 import random
 import numpy as np
+import nltk
 from nltk import word_tokenize
 from nltk.stem import WordNetLemmatizer
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Activation, Dropout
+from tensorflow.keras.layers import Dense, Dropout
 from tensorflow.keras.optimizers import SGD
 import pickle
 
+# Download necessary NLTK models
+nltk.download('punkt')
+nltk.download('wordnet')
 
 lemmatizer = WordNetLemmatizer()
-words=[]
+words = []
 classes = []
 documents = []
-ignore = ['?', '!', '.', ',', "'"]
+ignore_chars = ['?', '!', '.', ',', "'"]
 
-# Load the prompts and answers dataset
-with open("intents.json", "r") as json_file:
-    intents = json.load(json_file)
-
-
+# Load intents
+with open("intents.json", "r") as file:
+    intents = json.load(file)
 
 for intent in intents['intents']:
     for pattern in intent['patterns']:
-        
-        # Tokenize each word
-        w = word_tokenize(pattern)  
+        # Tokenize each word in the sentence
+        w = word_tokenize(pattern)
+        # Add words to the words list
         words.extend(w)
-
         # Add documents in the corpus
         documents.append((w, intent['tag']))
-
-        # Add unique intents into classes
+        # Add to our classes list
         if intent['tag'] not in classes:
             classes.append(intent['tag'])
 
-# Lower and lemmatize each word
-words = [lemmatizer.lemmatize(w.lower()) for w in words if w not in ignore]
-
-# Remove duplicates and sort the list
+# Lemmatize, lower each word and remove duplicates
+words = [lemmatizer.lemmatize(w.lower()) for w in words if w not in ignore_chars]
 words = sorted(list(set(words)))
 classes = sorted(list(set(classes)))
 
-# documents = list of patterns & intents
-print(len(documents), "documents")
-# classes = intents
-print(len(classes), "classes", classes)
-# words = meaningful words
-print(len(words), "unique lemmatized words", words)
-
-
-pickle.dump(words,open('words.pkl','wb'))
-pickle.dump(classes,open('classes.pkl','wb'))
-
-
-train = []
-output_empty = np.zeros(len(classes), dtype="uint8")
+# Initialize training data
+training = []
+output_empty = [0] * len(classes)
 
 for doc in documents:
-    bag = []
-    # list of tokenized words for the pattern
-    pattern_words = doc[0]
-    pattern_words = [lemmatizer.lemmatize(word.lower()) for word in pattern_words]
-    # create our bag of words array with 1, if word match found in current pattern
+    bag = [0]*len(words)
+    pattern_words = [lemmatizer.lemmatize(word.lower()) for word in doc[0]]
     for w in words:
-        bag.append(1) if w in pattern_words else bag.append(0)
-    
-    # output is 0 for every tag and 1 for current tag (for each pattern)
+        if w in pattern_words:
+            bag[words.index(w)] = 1
     output_row = list(output_empty)
     output_row[classes.index(doc[1])] = 1
-    
-    train.append([bag, output_row])
+    training.append([bag, output_row])
 
-# Shuffle features
-random.shuffle(train)
-train = np.array(train)
+random.shuffle(training)
+training = np.array(training, dtype=object)
 
+# Create train and test lists. X - patterns, Y - intents
+X_train = np.array(list(training[:, 0]), dtype='float32')
+y_train = np.array(list(training[:, 1]), dtype='float32')
 
-X_train = list(train[:,0])
-y_train = list(train[:,1])
-
-print("Training data created")
-print(len(y_train[0]))
-
-# Create model with 3 layers
-# First layer contains 128 neurons, second layer has 64 neurons. 
-# 3rd layer is the output layer that contains number of neurons
-# equal to number of intents (80)
+# Create model - 3 layers. First layer 128 neurons, second layer 64 neurons and 3rd output layer contains number of neurons
+# equal to number of intents to predict output intent with softmax
 model = Sequential()
 model.add(Dense(128, input_shape=(len(X_train[0]),), activation='relu'))
 model.add(Dropout(0.5))
@@ -94,12 +70,12 @@ model.add(Dense(64, activation='relu'))
 model.add(Dropout(0.5))
 model.add(Dense(len(y_train[0]), activation='softmax'))
 
-# Compile the model
-sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+# Compile model. Stochastic gradient descent with Nesterov accelerated gradient gives good results for this model
+sgd = SGD(learning_rate=0.01, decay=1e-6, momentum=0.9, nesterov=True)
 model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
 
-# fitting and saving the model 
-hist = model.fit(np.array(X_train), np.array(y_train), epochs=200, batch_size=5, verbose=1)
-model.save('chatbot_model.h5', hist)
+# Fitting and saving the model
+model.fit(X_train, y_train, epochs=200, batch_size=5, verbose=1)
+model.save('chatbot_model.h5')
 
-print("model created and saved")
+print("Model is created and saved")
