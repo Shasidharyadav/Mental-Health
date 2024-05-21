@@ -45,24 +45,28 @@ training = []
 output_empty = [0] * len(classes)
 
 for doc in documents:
-    bag = [0]*len(words)
+    # Initialize bag of words
+    bag = [0] * len(words)
+    # List of tokenized words for the pattern
     pattern_words = [lemmatizer.lemmatize(word.lower()) for word in doc[0]]
+    # Create bag of words array
     for w in words:
         if w in pattern_words:
             bag[words.index(w)] = 1
+    # Output is a '0' for each tag and '1' for the current tag
     output_row = list(output_empty)
     output_row[classes.index(doc[1])] = 1
     training.append([bag, output_row])
 
+# Shuffle the training data and convert to numpy arrays
 random.shuffle(training)
 training = np.array(training, dtype=object)
 
-# Create train and test lists. X - patterns, Y - intents
+# Split the training data into patterns (X) and intents (y)
 X_train = np.array(list(training[:, 0]), dtype='float32')
 y_train = np.array(list(training[:, 1]), dtype='float32')
 
-# Create model - 3 layers. First layer 128 neurons, second layer 64 neurons and 3rd output layer contains number of neurons
-# equal to number of intents to predict output intent with softmax
+# Create the model - 3 layers: input, hidden, and output layer
 model = Sequential()
 model.add(Dense(128, input_shape=(len(X_train[0]),), activation='relu'))
 model.add(Dropout(0.5))
@@ -70,12 +74,16 @@ model.add(Dense(64, activation='relu'))
 model.add(Dropout(0.5))
 model.add(Dense(len(y_train[0]), activation='softmax'))
 
-# Compile model. Stochastic gradient descent with Nesterov accelerated gradient gives good results for this model
+# Compile the model using stochastic gradient descent with Nesterov accelerated gradient
 sgd = SGD(learning_rate=0.01, decay=1e-6, momentum=0.9, nesterov=True)
 model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
 
-# Fitting and saving the model
+# Train the model
 model.fit(X_train, y_train, epochs=200, batch_size=5, verbose=1)
 model.save('chatbot_model.h5')
 
 print("Model is created and saved")
+
+# Save words and classes for future use
+pickle.dump(words, open('words.pkl', 'wb'))
+pickle.dump(classes, open('classes.pkl', 'wb'))
