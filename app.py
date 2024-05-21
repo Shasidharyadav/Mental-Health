@@ -1,7 +1,3 @@
-'''
-Data Credits: https://www.kaggle.com/code/vafaknm/chatbot-for-mental-health-analysis/input
-'''
-
 from flask import Flask, render_template, request, jsonify
 from model import chat
 
