@@ -1,3 +1,4 @@
+import os
 import json
 import random
 import numpy as np
@@ -5,9 +6,12 @@ import nltk
 from nltk import word_tokenize
 from nltk.stem import WordNetLemmatizer
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout
+from tensorflow.keras.layers import Dense, Dropout, Input
 from tensorflow.keras.optimizers import SGD
 import pickle
+
+# Suppress TensorFlow warnings
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 # Download necessary NLTK models
 nltk.download('punkt')
@@ -66,9 +70,13 @@ training = np.array(training, dtype=object)
 X_train = np.array(list(training[:, 0]), dtype='float32')
 y_train = np.array(list(training[:, 1]), dtype='float32')
 
+print("X_train shape:", X_train.shape)
+print("y_train shape:", y_train.shape)
+
 # Create the model - 3 layers: input, hidden, and output layer
 model = Sequential()
-model.add(Dense(128, input_shape=(len(X_train[0]),), activation='relu'))
+model.add(Input(shape=(len(X_train[0]),)))
+model.add(Dense(128, activation='relu'))
 model.add(Dropout(0.5))
 model.add(Dense(64, activation='relu'))
 model.add(Dropout(0.5))
@@ -80,7 +88,7 @@ model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy
 
 # Train the model
 model.fit(X_train, y_train, epochs=200, batch_size=5, verbose=1)
-model.save('chatbot_model.h5')
+model.save('chatbot_model.keras')
 
 print("Model is created and saved")
 

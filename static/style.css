@@ -27,7 +27,7 @@ body {
   font-size: 400%;
   position: absolute;
   top: 6%;
-  left: 45%;
+  left: 46%;
   transform: translate(-50%, -50%);
   color: rgb(26, 8, 67);
 }
@@ -226,12 +226,13 @@ body {
 .img {
   position: relative;
   overflow: hidden;
-  height: 115vh;
-  width: 110%;
+  height: 110vh;
+  width: auto;
   
 }
 #background-video {
   position: absolute;
-  width: auto;
-  height: 100%;
+  height: inherit;
+  width: 100%;
+  
 }

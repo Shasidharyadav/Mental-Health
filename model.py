@@ -6,7 +6,7 @@ from nltk.stem import WordNetLemmatizer
 import pickle
 from tensorflow.keras.models import load_model
 
-model = load_model('chatbot_model.h5')
+model = load_model('chatbot_model.keras')
 
 intents = json.loads(open('intents.json').read())
 words = pickle.load(open('words.pkl', 'rb'))

@@ -8,9 +8,13 @@
 </head>
 
 <body>
-    <h1 class="head">Welcome to Mental Health Support!</h1>
     <div class="img">
-        <img src="{{ url_for('static', filename='images/mental-health.png') }}" width="400" height="330">
+        <video autoplay muted loop id="background-video">
+            <source src="{{ url_for('static', filename='images/Chitti.mp4') }}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <h1 class="head">Welcome to TheraTalkAi!</h1>
+
     </div>
     <div class="container">
     <div class="chatbox">
@@ -18,7 +22,7 @@
             <div class="chatbox__header">
                 <div class="chatbox__content--header">
                     <h4 class="chatbox__heading--header">TheraTalkAi</h4>
-                    <p class="chatbox__description--header">Hey. I'm Chitti, your <em>mini friend</em></p>
+                    <p class="chatbox__description--header">Hey. I'm Chitti,  <em>your mini friend</em></p>
                 </div>
             </div>
             <div class="chatbox__messages">
